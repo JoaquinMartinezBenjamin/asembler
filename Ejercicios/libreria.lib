@@ -1,0 +1,568 @@
+;______________________________________________________________________________
+posicionCursor macro x, y
+    mov bx, 0               ;cero para graficos
+    mov ah, 02h
+    mov dh, y               ;renglon
+    mov dl, x               ;columna
+    int 10h
+endm
+
+
+
+
+colorerPantalla macro x, y
+        mov ah, 06
+        mov al, 00
+        mov bh, 15
+        mov cx, x     ;esquina supererior izquierda
+        mov dx, y     ;esquina inferior derecha
+        int 10h
+endm
+
+
+
+;______________________________________________________________________________
+
+
+
+
+
+
+
+
+
+capturarCadena macro arreglo, x     ;usar con variable arreglo 
+
+
+MOV SI,0 
+Cad1: 
+;::::::::::::::::::::::::::::::::::::::::::::::::::::::::;
+call read
+CMP AL,0DH ;comparo si corresponde con enter
+je continuar 
+
+MOV arreglo[SI],AL ;muevo a la cadena en posicion si caracter en al
+INC SI ;incremento si
+CMP SI,x ;compara si llene la capacidad de mi cadena
+JAE continuar ;si es mayor o igual continua a capturar la segunda cadena
+JMP Cad1 ;regreso al ciclo
+;::::::::::::::::::::::::::::::::::::::::::::::::::::::::;
+continuar:
+;::::::::::::::::::::::::::::::::::::::::::::::::::::::::;
+
+endm 
+;______________________________________________________________________________
+
+contarNumerosLetras macro  arreglo 
+
+mov si, 0
+mov di, 0           
+mov bl,'$'
+mov ch, 0
+mov cl, 0
+
+mov si, offset arreglo
+
+ciclo:
+
+
+cmp arreglo[si], bl
+je salir
+cmp arreglo[si],30h
+jae validad
+inc si
+jmp ciclo
+
+
+validad:
+
+cmp arreglo[si], 39h
+jbe   incrementad            ; menor o igual
+cmp arreglo[si],41h
+jae validam
+inc si
+jmp ciclo
+
+
+
+
+
+
+incrementad:
+inc ch        ; incremento contador de digitos
+inc si
+jmp ciclo     ; regreso al ciclo 
+
+validam:
+
+cmp arreglo[si],5AH
+jbe incremental
+jmp validami
+
+
+incremental:
+inc cl       ; incremento contador de letras por mayuscula o minuscula 
+inc si
+jmp ciclo      ; regreso al ciclo 
+
+
+validami:
+
+cmp arreglo[si], 7AH 
+jbe validami2 
+inc si 
+jmp ciclo 
+
+
+validami2:
+cmp arreglo[si],61h
+jae incremental
+inc si
+jmp ciclo
+
+
+salir:
+             
+      add ch, 30h      ;contador de numeros
+	  add cl, 30h       ; contador de letras 
+
+endm 
+;______________________________________________________________________________
+
+write macro texto
+  MOV DX,offset texto      ;ingrese arreglo
+MOV AH,09
+INT 21h
+endm
+
+
+
+writeLetra macro t
+    mov ah, 02h
+    mov dl, t               ;imprime caracter en dl 
+    int 21h
+endm
+
+
+estado_mouse macro
+	   
+   mov ax,03
+		   ;Devuelve bx= estado del botón 
+                           ;cx coordenada x en pixeles
+                           ;dx coordenada y en pixeles 
+   int 33h
+	
+endm
+		
+
+
+obtener_fila macro valor_cx
+
+mov ax,valor_cx
+	
+mov bl,8
+	
+div bl
+	
+endm
+	
+	
+
+obtener_columna macro valor_dx
+	
+mov ax,valor_dx
+	
+mov bl,8
+	
+div bl
+	
+endm
+;______________________________________________________________________________
+
+mouse_dentro_click_izquierdo macro xs,ys,xi,yi   ; dl = 1 si dentro -- dl= 0 si fuera   
+
+ mov dl,0      ;valor inicial 
+ mov bx, 2 
+ mov ax,03
+		            ;Devuelve bx= estado del botón 
+                    ;cx coordenada x en pixeles   _columnas
+                    ;dx coordenada y en pixeles   _filas 
+   int 33h
+  cmp bx,1          ;click izquierdo 
+  jne finaliza 
+   mov ax,cx
+   mov bl,8
+   div bl	
+   
+   validaxs:
+   cmp al,xs
+   jae validaxi
+   jmp finaliza 
+   
+   validaxi:
+   cmp al,xi
+   jbe validays 
+   jmp finaliza
+   
+   validays:
+   mov ax,dx
+   mov bl,8
+   div bl	
+   
+   cmp al,ys
+   jae validayi
+   jmp finaliza 
+   
+   validayi:
+   cmp al, yi
+   jbe retorna
+   jmp finaliza 
+   
+   
+   
+   retorna:
+   mov dl,1
+   jmp saliendo
+   
+   finaliza:
+   mov dl,0
+   
+   saliendo:
+    
+   
+
+endm 
+
+
+mouse_dentro_click_izquierdo2 macro xs,ys,xi,yi   ; dl = 1 si dentro -- dl= 0 si fuera   
+
+ mov dl,0      ;valor inicial 
+ mov bx, 2 
+ mov ax,03
+		            ;Devuelve bx= estado del botón 
+                    ;cx coordenada x en pixeles   _columnas
+                    ;dx coordenada y en pixeles   _filas 
+   int 33h
+  cmp bx,1          ;click izquierdo 
+  jne finaliza2 
+   mov ax,cx
+   mov bl,8
+   div bl	
+   
+   validaxs2:
+   cmp al,xs
+   jae validaxi2
+   jmp finaliza2
+   
+   validaxi2:
+   cmp al,xi
+   jbe validays2 
+   jmp finaliza2
+   
+   validays2:
+   mov ax,dx
+   mov bl,8
+   div bl	
+   
+   cmp al,ys
+   jae validayi2
+   jmp finaliza 
+   
+   validayi2:
+   cmp al, yi
+   jbe retorna2
+   jmp finaliza2 
+   
+   
+   
+   retorna2:
+   mov dl,1
+   jmp saliendo2
+   
+   finaliza2:
+   mov dl,0
+   
+   saliendo2:
+    
+   
+
+endm 
+
+mouse_dentro_click_izquierdo3 macro xs,ys,xi,yi   ; dl = 1 si dentro -- dl= 0 si fuera   
+
+ mov dl,0      ;valor inicial 
+ mov bx, 2 
+ mov ax,03
+		            ;Devuelve bx= estado del botón 
+                    ;cx coordenada x en pixeles   _columnas
+                    ;dx coordenada y en pixeles   _filas 
+   int 33h
+  cmp bx,1          ;click izquierdo 
+  jne finaliza3 
+   mov ax,cx
+   mov bl,8
+   div bl	
+   
+   validaxs3:
+   cmp al,xs
+   jae validaxi3
+   jmp finaliza3
+   
+   validaxi3:
+   cmp al,xi
+   jbe validays3
+   jmp finaliza3
+   
+   validays3:
+   mov ax,dx
+   mov bl,8
+   div bl	
+   
+   cmp al,ys
+   jae validayi3
+   jmp finaliza 
+   
+   validayi3:
+   cmp al, yi
+   jbe retorna3
+   jmp finaliza3
+   
+   
+   
+   retorna3:
+   mov dl,1
+   jmp saliendo3
+   
+   finaliza3:
+   mov dl,0
+   
+   saliendo3:
+    
+   
+
+endm 
+
+
+
+mouse_dentro_click_izquierdo4 macro xs,ys,xi,yi   ; dl = 1 si dentro -- dl= 0 si fuera   
+
+ mov dl,0      ;valor inicial 
+ mov bx, 2 
+ mov ax,03
+		            ;Devuelve bx= estado del botón 
+                    ;cx coordenada x en pixeles   _columnas
+                    ;dx coordenada y en pixeles   _filas 
+   int 33h
+  cmp bx,1          ;click izquierdo 
+  jne finaliza4 
+   mov ax,cx
+   mov bl,8
+   div bl	
+   
+   validaxs4:
+   cmp al,xs
+   jae validaxi4
+   jmp finaliza4
+   
+   validaxi4:
+   cmp al,xi
+   jbe validays4
+   jmp finaliza4
+   
+   validays4:
+   mov ax,dx
+   mov bl,8
+   div bl	
+   
+   cmp al,ys
+   jae validayi4
+   jmp finaliza 
+   
+   validayi4:
+   cmp al, yi
+   jbe retorna4
+   jmp finaliza4
+   
+   
+   
+   retorna4:
+   mov dl,1
+   jmp saliendo4
+   
+   finaliza4:
+   mov dl,0
+   
+   saliendo4:
+    
+   
+
+endm 
+
+
+
+mouse_dentro_click_izquierdo5 macro xs,ys,xi,yi   ; dl = 1 si dentro -- dl= 0 si fuera   
+
+ mov dl,0      ;valor inicial 
+ mov bx, 2 
+ mov ax,03
+		            ;Devuelve bx= estado del botón 
+                    ;cx coordenada x en pixeles   _columnas
+                    ;dx coordenada y en pixeles   _filas 
+   int 33h
+  cmp bx,1          ;click izquierdo 
+  jne finaliza5
+   mov ax,cx
+   mov bl,8
+   div bl	
+   
+   validaxs5:
+   cmp al,xs
+   jae validaxi5
+   jmp finaliza5
+   
+   validaxi5:
+   cmp al,xi
+   jbe validays5
+   jmp finaliza5
+   
+   validays5:
+   mov ax,dx
+   mov bl,8
+   div bl	
+   
+   cmp al,ys
+   jae validayi5
+   jmp finaliza 
+   
+   validayi5:
+   cmp al, yi
+   jbe retorna5
+   jmp finaliza5
+   
+   
+   
+   retorna5:
+   mov dl,1
+   jmp saliendo5
+   
+   finaliza5:
+   mov dl,0
+   
+   saliendo5:
+    
+   
+
+endm 
+
+
+
+codigo SEGMENT 'CODE'
+Assume ss:pila, ds:datos, cs:codigo
+
+
+iniciarRaton proc near
+        mov ax,00           ;restablecer raton y obtener estado
+        int 33h
+        ret
+iniciarRaton endp
+
+mostrarRaton proc near
+        mov ax, 01h         ;mostrar puntero del raton 	
+        int 33h
+        ret
+mostrarRaton endp    
+
+
+limpiarPantalla proc near
+        mov ah, 06
+        mov al, 00
+        mov bh, 2
+        mov cx, 00h        ;esquina supererior izquierda
+        mov dx, 184fh      ;esquina inferior derecha
+        int 10h
+        ret
+limpiarPantalla endp
+
+  read PROC
+       mov ah, 01h
+       int 21h
+       ret
+    read ENDP
+	
+	
+	salto PROC near
+	MOV AH,02H
+    MOV DL,0AH
+    INT 21H 
+	ret
+	salto ENDP 
+	
+	
+	
+	
+	
+	pintaNaranja proc near
+        mov ah, 06
+        mov al, 00
+        mov bh, 4,l
+        mov cx, 00h        ;esquina supererior izquierda
+        mov dx, 184fh      ;esquina inferior derecha
+        int 10h
+        ret
+      pintaNaranja endp
+	  
+	  
+	  
+	  
+	  	
+	pintaVerde proc near
+        mov ah, 06
+        mov al, 00
+        mov bh, 2
+        mov cx, 00h        ;esquina supererior izquierda
+        mov dx, 184fh      ;esquina inferior derecha
+        int 10h
+        ret
+      pintaVerde endp
+	  
+	  
+	  
+	  	
+	pintaMorado proc near
+        mov ah, 06
+        mov al, 00
+        mov bh, 5
+        mov cx, 00h        ;esquina supererior izquierda
+        mov dx, 184fh      ;esquina inferior derecha
+        int 10h
+        ret
+      pintaMorado endp
+	  
+	  	
+	pintaAzul proc near
+        mov ah, 06
+        mov al, 00
+        mov bh, 1
+        mov cx, 00h        ;esquina supererior izquierda
+        mov dx, 184fh      ;esquina inferior derecha
+        int 10h
+        ret
+      pintaAzul endp
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+	  
+
+	
+	
+	
+	
+
+codigo ENDS

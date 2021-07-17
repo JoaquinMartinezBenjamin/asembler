@@ -1,0 +1,101 @@
+
+write MACRO letrero
+	lea dx,letrero
+	mov ah,09h
+	int 21h
+ENDM
+
+write2 MACRO letrero
+	mov dl,letrero
+	mov ah,02h
+	int 21h
+ENDM
+
+CLEAR MACRO
+	mov ah,00h
+	mov al,03h
+	int 10h
+ENDM
+
+gotoxy MACRO fila, columna
+	mov ah,02h
+	mov bh,00h
+	mov dh,fila
+	mov dl,columna
+	int 10h
+ENDM
+
+
+
+
+pixel macro color, fila, columna
+	mov ah, 13h
+	mov al, 00h
+	mov bh, 00h
+	mov bl, color
+	mov dh, fila    ;fila
+	mov dl, columna ;columna
+	mov cx, 2      ;longitud
+	int 10h
+endm
+
+
+ventana MACRO renglon,columna, renglon2,columna2,color
+    MOV ch,renglon
+	mov cl,columna
+	mov dh,renglon2
+	mov dl,columna2
+	MOV AH,06h
+	mov bh,color
+	INT 10h
+endm
+
+clearxy macro rx,cx,ry,cy,col
+	mov ch, rx
+	mov cl, cx
+	mov dh, ry
+	mov dl, cy
+	mov bh, col
+	mov ah, 06h
+	mov al, 00h
+	int 10h
+endm
+
+
+;mouse macro
+;	mov ax,05h
+;	mov bx,0
+;	int 33h
+;endm
+
+
+llenar macro arreglo
+	local llena, fin
+	mov si,0
+	llena:
+			read
+		CMP AL,0DH; compara con enter
+		JE fin
+    	MOV arreglo[SI],AL
+    	INC SI
+    	JMP llena
+    fin:
+endm
+
+ read macro 
+mov ah,01h
+	int 21h
+	endm
+
+codigo SEGMENT 'CODE'
+leer proc FAR
+
+mov ah,01h
+	int 21h
+
+leer endp 
+
+codigo ends 
+
+
+

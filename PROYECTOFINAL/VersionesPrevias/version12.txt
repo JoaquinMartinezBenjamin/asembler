@@ -1,0 +1,998 @@
+#include<graphics.h>
+#include<dos.h>
+#include<math.h>
+#include<stdlib.h>
+#include<stdio.h>
+#include<conio.h>
+
+char nombreArchivo1[]="gato.txt";
+char nombreArchivo2[]="gato2.txt";  //cambiarnombre
+char nombreArchivo3[]="gato3.txt";  //cambiarnombre
+//char nombreArchivo1[] = "";
+int piezasEncajas[]={0,0,0,0,0,0,0};
+int manejador = 0;
+int contadorPiezas=0;
+int id=3;
+
+char  contenidoArchivo[138];
+char contenidoArchivo2[138];
+char contenidoArchivo3[138];
+int cv1x,cv2x,cv3x,cv4x,cv1y,cv2y,cv3y,cv4y,
+    tmv1x,tmv2x,tmv3x,tmv1y,tmv2y,tmv3y,
+    trv1x,trv2x,trv3x,trv1y,trv2y,trv3y,
+	tvv1x,tvv2x,tvv3x,tvv1y,tvv2y,tvv3y,
+	tav1x,tav2x,tav3x,tav1y,tav2y,tav3y,
+	tbv1x,tbv2x,tbv3x,tbv1y,tbv2y,tbv3y,
+	rv1x,rv2x,rv3x,rv4x,rv1y,rv2y,rv3y,rv4y;
+	
+int x,y,button,prevx,prevy,temp1,temp2,key,maxx,maxy,color,auxx,auxy,contadorClickDerecho,colorTeclado;
+
+char xx,yy;
+	
+	int  v[46];
+	int v2[46];
+	int v3[46];
+	int actual[46];
+
+	
+	
+void limpiarPantalla(char xx,char yy) {
+   asm      mov ah, 06
+   asm      mov al, 00 
+   asm      mov bh, 15
+   asm      mov cx, 00h        //esquina supererior izquierda
+   asm      mov dh,xx
+   asm      mov dl,yy
+   asm      int 10h
+}  
+void MostrarMouse()  {                                 //Mostra el mouse en la pantalla
+asm mov ax, 01h
+asm int 33h
+}
+
+void OcultarMouse()  {                                 //Ocultar el cursor del mouse
+asm mov ax, 02h
+asm int 33h
+}
+
+void FijarLimites( int x1, int y1, int x2, int y2){
+//Limites horizontales 
+asm mov ax, 07h 
+asm mov cx, x1
+asm mov dx, x2
+asm int 33h
+//Limites verticales 
+asm mov ax, 08h 
+asm mov cx, y1
+asm mov dx, y2
+asm int 33h
+}
+
+void ObtenerMousePos(int *button,int *x,int *y){
+//Obtener posición del puntero del mouse 
+
+int aux, auy, b;
+
+asm mov ax, 03h
+asm int 33h
+asm mov aux, cx
+asm mov auy, dx
+asm mov b, bx
+
+*button = b;
+*x =aux;
+*y =auy;
+                                }
+								
+
+	
+								
+							
+
+void validaTriangulo1(){
+
+if ((actual[0]==tvv1x)
+  &&(actual[1]==tvv2x)
+  &&(actual[2]==tvv3x)
+  &&(actual[3]==tvv1y)
+  &&(actual[4]==tvv2y)
+  &&(actual[5]==tvv3y)
+  ){piezasEncajas[0]=1;
+    contadorPiezas++;}
+  
+  }
+  
+void validaTriangulo2(){
+
+if ((actual[6]==trv1x)
+  &&(actual[7]==trv2x)
+  &&(actual[8]==trv3x)
+  &&(actual[9]==trv1y)
+  &&(actual[10]==trv2y)
+  &&(actual[11]==trv3y)
+  ){piezasEncajas[1]=1;
+  contadorPiezas++;}
+  
+  }
+
+ void validaTriangulo3(){
+
+if ((actual[12]==tbv1x)
+  &&(actual[13]==tbv2x)
+  &&(actual[14]==tbv3x)
+  &&(actual[15]==tbv1y)
+  &&(actual[16]==tbv2y)
+  &&(actual[17]==tbv3y)
+  ){piezasEncajas[2]=1;
+  contadorPiezas++;}
+  
+  
+    
+  
+  }
+  
+ void validaTriangulo4(){
+
+if ((actual[18]==tav1x)
+  &&(actual[19]==tav2x)
+  &&(actual[20]==tav3x)
+  &&(actual[21]==tav1y)
+  &&(actual[22]==tav2y)
+  &&(actual[23]==tav3y)
+  ){piezasEncajas[3]=1;
+  contadorPiezas++;}
+  
+ 
+    
+  
+  }  
+  
+ void validaTriangulo5(){
+
+if ((actual[24]==tmv1x)
+  &&(actual[25]==tmv2x)
+  &&(actual[26]==tmv3x)
+  &&(actual[27]==tmv1y)
+  &&(actual[28]==tmv2y)
+  &&(actual[29]==tmv3y)
+  ){piezasEncajas[4]=1;
+  contadorPiezas++;}
+   
+   
+   }
+
+
+void validaRombo(){
+	
+ 
+if ((rv1x==actual[38])
+  &&(rv2x==actual[39])
+  &&(rv3x==actual[40])
+  &&(rv4x==actual[41])
+  &&(rv1y==actual[42])
+  &&(rv2y==actual[43])
+  &&(rv3y==actual[44])
+  &&(rv4y==actual[45])
+    ){piezasEncajas[6]=1;
+	contadorPiezas++;}
+
+			
+		}	
+	
+	
+void validaCuadro(){
+	
+	
+if ((cv1x==actual[30])
+  &&(cv2x==actual[31])
+  &&(cv3x==actual[32])
+  &&(cv4x==actual[33])
+  &&(cv1y==actual[34])
+  &&(cv2y==actual[35])
+  &&(cv3y==actual[36])
+  &&(cv4y==actual[37])
+    ){piezasEncajas[5]=1;
+	contadorPiezas++;} 
+ 
+	
+		}	
+
+	
+void iniciarVertices(){
+	
+	//tringulo_verde
+     tvv1x= 425;  tvv1y= 55;
+	 tvv2x= 525;  tvv2y= 155;
+	 tvv3x= 625;  tvv3y= 55;
+          //triangulo_rojo
+	      trv1x= 525;  trv1y= 155;
+	      trv2x= 625;  trv2y= 55;
+	      trv3x= 625;  trv3y= 255;
+	             //triangulo_magenta
+	             tmv1x= 575;  tmv1y= 205;
+	             tmv2x= 625;  tmv2y= 255;
+	             tmv3x= 525;  tmv3y= 255;
+	                    //triangulo_cyan
+	                     tav1x= 525; tav1y= 155;
+		                 tav2x= 475; tav2y= 205;
+	                     tav3x= 475; tav3y= 105;
+	                           //triangulo_cyanlight
+	                           tbv1x= 425;  tbv1y= 155;
+		                       tbv2x= 425;  tbv2y= 255;
+	                           tbv3x= 525;  tbv3y= 255;
+	                                  //rombo
+	                                  rv1x= 425;  rv1y= 55;
+		                              rv2x= 475;  rv2y= 105;
+		                              rv3x= 475;  rv3y= 205;
+	                                  rv4x= 425;  rv4y= 155;
+		                                    //cuadrado
+	                                        cv1x= 525;  cv1y= 155;
+		                                    cv2x= 575;  cv2y= 205;
+		                                    cv3x= 525;  cv3y= 255;
+	                                        cv4x= 475;  cv4y= 205;
+		}
+void moverTriangulo_lcyan(int *auxx,int *auxy){
+	if(piezasEncajas[2]==0){
+   tbv1x= tbv1x + *auxx;  tbv2x= tbv2x + *auxx; tbv3x= tbv3x + *auxx;
+   tbv1y= tbv1y + *auxy;  tbv2y= tbv2y + *auxy; tbv3y= tbv3y + *auxy;
+	validaTriangulo3();
+	}
+	                                          }
+void moverTriangulo_cyan(int *auxx,int *auxy){
+	if(piezasEncajas[3]==0){
+   tav1x= tav1x + *auxx;  tav2x= tav2x + *auxx; tav3x= tav3x + *auxx;
+   tav1y= tav1y + *auxy;  tav2y= tav2y + *auxy; tav3y= tav3y + *auxy;
+	          validaTriangulo4();            }
+	                                          }
+void moverTriangulo_verde(int *auxx,int *auxy){
+	if(piezasEncajas[0]==0){
+   tvv1x= tvv1x + *auxx;  tvv2x= tvv2x + *auxx; tvv3x= tvv3x + *auxx;
+   tvv1y= tvv1y + *auxy;  tvv2y= tvv2y + *auxy; tvv3y= tvv3y + *auxy;
+   validaTriangulo1();
+	}
+	                                          }
+void moverTriangulo_rojo(int *auxx,int *auxy) {
+	if(piezasEncajas[1]==0){
+   trv1x= trv1x + *auxx;  trv2x= trv2x + *auxx; trv3x= trv3x + *auxx;
+   trv1y= trv1y + *auxy;  trv2y= trv2y + *auxy; trv3y= trv3y + *auxy;
+   validaTriangulo2();
+	}
+                                              }
+			
+void moverTriangulo_magenta(int *auxx,int *auxy){
+	if (piezasEncajas[4]==0){
+   tmv1x= tmv1x + *auxx; tmv2x= tmv2x + *auxx;  tmv3x= tmv3x + *auxx;
+   tmv1y= tmv1y + *auxy; tmv2y= tmv2y + *auxy;  tmv3y= tmv3y + *auxy;
+   validaTriangulo5();
+	}
+	                                            }											  
+void moverCuadrado(int *auxx,int *auxy)         {
+	if   (piezasEncajas[5]==0){
+   cv1x= cv1x + *auxx;  cv2x= cv2x + *auxx;  cv3x= cv3x + *auxx; cv4x= cv4x + *auxx;
+   cv1y= cv1y + *auxy;  cv2y= cv2y + *auxy;  cv3y= cv3y + *auxy; cv4y= cv4y + *auxy;
+    validaCuadro();
+	                            }
+	                                            }	  
+void moverRombo(int *auxx,int *auxy)            {
+	
+	if (piezasEncajas[6]==0){
+   rv1x= rv1x + *auxx;  rv2x= rv2x + *auxx;  rv3x= rv3x + *auxx; rv4x= rv4x + *auxx;
+   rv1y= rv1y + *auxy;  rv2y= rv2y + *auxy;  rv3y= rv3y + *auxy; rv4y= rv4y + *auxy;
+    validaRombo();
+	  }
+                                                }
+	  
+
+	  
+		
+void rotarTriangulo_verde(){
+	if (piezasEncajas[0]==0){
+	contadorClickDerecho++;
+	if(contadorClickDerecho==1){  tvv1x= 425;  tvv1y= 205; tvv2x= 525;   tvv2y= 305; tvv3x= 625;   tvv3y= 205;}
+	if(contadorClickDerecho==2){  tvv1x= 525;  tvv1y= 200; tvv2x= 525;   tvv2y= 325; tvv3x= 650;   tvv3y= 325;}
+	if(contadorClickDerecho==3){  tvv1x= 525;  tvv1y= 305; tvv2x= 625;   tvv2y= 205; tvv3x= 625;   tvv3y= 405;}
+	if(contadorClickDerecho==4){  tvv1x= 650;  tvv1y= 305; tvv2x= 525;   tvv2y= 305; tvv3x= 525;   tvv3y= 430;}
+	if(contadorClickDerecho==5){  tvv1x= 425;  tvv1y= 405; tvv2x= 525;   tvv2y= 305; tvv3x= 625;   tvv3y= 405;}
+	if(contadorClickDerecho==6){  tvv1x= 525;  tvv1y= 430; tvv2x= 525;   tvv2y= 305; tvv3x= 400;   tvv3y= 305;}
+	if(contadorClickDerecho==7){  tvv1x= 425;  tvv1y= 405; tvv2x= 525;   tvv2y= 305; tvv3x= 425;   tvv3y= 205;}
+	if(contadorClickDerecho==8){  tvv1x= 400;  tvv1y= 325; tvv2x= 525;   tvv2y= 325; tvv3x= 525;   tvv3y= 200;}
+    if(contadorClickDerecho==8){  contadorClickDerecho=0;} 
+	}
+                            }
+void rotarTriangulo_rojo() {
+	if(piezasEncajas[1]==0){
+	contadorClickDerecho++;
+	if(contadorClickDerecho==1){  trv1x= 525;  trv1y= 305; trv2x= 625;   trv2y= 205; trv3x= 625;   trv3y= 405;}
+	if(contadorClickDerecho==2){  trv1x= 425;  trv1y= 205; trv2x= 525;   trv2y= 305; trv3x= 625;   trv3y= 205;}
+	if(contadorClickDerecho==3){  trv1x= 525;  trv1y= 200; trv2x= 525;   trv2y= 325; trv3x= 650;   trv3y= 325;}
+	if(contadorClickDerecho==4){  trv1x= 650;  trv1y= 305; trv2x= 525;   trv2y= 305; trv3x= 525;   trv3y= 430;}
+	if(contadorClickDerecho==5){  trv1x= 425;  trv1y= 405; trv2x= 525;   trv2y= 305; trv3x= 625;   trv3y= 405;}
+	if(contadorClickDerecho==6){  trv1x= 525;  trv1y= 430; trv2x= 525;   trv2y= 305; trv3x= 400;   trv3y= 305;}
+	if(contadorClickDerecho==7){  trv1x= 425;  trv1y= 405; trv2x= 525;   trv2y= 305; trv3x= 425;   trv3y= 205;}
+	if(contadorClickDerecho==8){  trv1x= 400;  trv1y= 325; trv2x= 525;   trv2y= 325; trv3x= 525;   trv3y= 200;}
+	if(contadorClickDerecho==8){  contadorClickDerecho=0;} 	
+	}
+                              }
+void rotarTriangulo_magenta(){	
+if (piezasEncajas[4]==0){
+	contadorClickDerecho++;
+	if(contadorClickDerecho==1){  tmv1x= 525;  tmv1y= 405; tmv2x= 588;   tmv2y= 405; tmv3x= 588;   tmv3y= 468;}
+	if(contadorClickDerecho==2){  tmv1x= 525;  tmv1y= 405; tmv2x= 575;   tmv2y= 455; tmv3x= 525;   tmv3y= 505;}
+	if(contadorClickDerecho==3){  tmv1x= 525;  tmv1y= 405; tmv2x= 525;   tmv2y= 468; tmv3x= 462;   tmv3y= 468;}
+    if(contadorClickDerecho==4){  tmv1x= 425;  tmv1y= 405; tmv2x= 475;   tmv2y= 455; tmv3x= 525;   tmv3y= 405;}
+    if(contadorClickDerecho==5){  tmv1x= 462;  tmv1y= 342; tmv2x= 525;   tmv2y= 405; tmv3x= 462;   tmv3y= 405;}
+	if(contadorClickDerecho==6){  tmv1x= 475;  tmv1y= 355; tmv2x= 525;   tmv2y= 305; tmv3x= 525;   tmv3y= 405;}
+	if(contadorClickDerecho==7){  tmv1x= 525;  tmv1y= 342; tmv2x= 588;   tmv2y= 342; tmv3x= 525;   tmv3y= 405;}
+	if(contadorClickDerecho==8){  tmv1x= 575;  tmv1y= 355; tmv2x= 625;   tmv2y= 405; tmv3x= 525;   tmv3y= 405;}
+	if(contadorClickDerecho==8){  contadorClickDerecho=0;} 
+}
+                              }
+void rotarTriangulo_cyan()   {
+	if(piezasEncajas[3]==0){
+	contadorClickDerecho++;
+	if(contadorClickDerecho==1){  tav1x= 525;  tav1y= 405; tav2x= 588;   tav2y= 405; tav3x= 588;   tav3y= 468;}
+	if(contadorClickDerecho==2){  tav1x= 525;  tav1y= 405; tav2x= 575;   tav2y= 455; tav3x= 525;   tav3y= 505;}
+	if(contadorClickDerecho==3){  tav1x= 525;  tav1y= 405; tav2x= 525;   tav2y= 468; tav3x= 462;   tav3y= 468;}
+    if(contadorClickDerecho==4){  tav1x= 425;  tav1y= 405; tav2x= 475;   tav2y= 455; tav3x= 525;   tav3y= 405;}
+    if(contadorClickDerecho==5){  tav1x= 462;  tav1y= 342; tav2x= 525;   tav2y= 405; tav3x= 462;   tav3y= 405;}
+	if(contadorClickDerecho==6){  tav1x= 475;  tav1y= 355; tav2x= 525;   tav2y= 305; tav3x= 525;   tav3y= 405;}
+	if(contadorClickDerecho==7){  tav1x= 525;  tav1y= 342; tav2x= 588;   tav2y= 342; tav3x= 525;   tav3y= 405;}
+	if(contadorClickDerecho==8){  tav1x= 575;  tav1y= 355; tav2x= 625;   tav2y= 405; tav3x= 525;   tav3y= 405;}
+	if(contadorClickDerecho==8){ contadorClickDerecho=0;} 
+	}
+                       } 
+void rotarTriangulo_lcyan(){
+	if(piezasEncajas[2]==0){
+	contadorClickDerecho++;
+	if(contadorClickDerecho==1){  tbv1x= 425;  tbv1y= 205; tbv2x= 525;   tbv2y= 205; tbv3x= 425;   tbv3y= 305;}
+	if(contadorClickDerecho==2){  tbv1x= 425;  tbv1y= 305; tbv2x= 500;   tbv2y= 230; tbv3x= 575;   tbv3y= 305;}
+	if(contadorClickDerecho==3){  tbv1x= 425;  tbv1y= 305; tbv2x= 525;   tbv2y= 305; tbv3x= 525;   tbv3y= 405;}
+	if(contadorClickDerecho==4){  tbv1x= 400;  tbv1y= 180; tbv2x= 475;   tbv2y= 105; tbv3x= 475;   tbv3y= 255;}
+	if(contadorClickDerecho==5){  tbv1x= 550;  tbv1y= 180; tbv2x= 475;   tbv2y= 105; tbv3x= 475;   tbv3y= 255;}
+	if(contadorClickDerecho==6){  tbv1x= 425;  tbv1y= 305; tbv2x= 500;   tbv2y= 380; tbv3x= 575;   tbv3y= 305;}
+	if(contadorClickDerecho==7){  tbv1x= 625;  tbv1y= 255; tbv2x= 625;   tbv2y= 355; tbv3x= 525;   tbv3y= 355; }
+	if(contadorClickDerecho==8){  tbv1x= 425;  tbv1y= 255; tbv2x= 425;   tbv2y= 355; tbv3x= 525;   tbv3y= 355; }
+    if(contadorClickDerecho==8){ contadorClickDerecho=0;} 
+	}
+                            }  
+void rotarCuadrado()          {
+	if   (piezasEncajas[5]==0){
+    contadorClickDerecho++;
+    if(contadorClickDerecho==1){cv1x= 525;  cv1y= 155; cv2x= 575;  cv2y= 205; cv3x= 525;   cv3y= 255; cv4x= 475;  cv4y= 205;}
+	if(contadorClickDerecho==2){cv1x= 525;  cv1y= 155; cv2x= 600;  cv2y= 155; cv3x= 600;   cv3y= 230; cv4x= 525;  cv4y= 230;}
+	if(contadorClickDerecho==3){cv1x= 525;  cv1y= 155; cv2x= 575;  cv2y= 205; cv3x= 525;   cv3y= 255; cv4x= 475;  cv4y= 205;}
+	if(contadorClickDerecho==4){cv1x= 525;  cv1y= 155; cv2x= 600;  cv2y= 155; cv3x= 600;   cv3y= 230; cv4x= 525;  cv4y= 230;}
+	if(contadorClickDerecho==5){cv1x= 525;  cv1y= 155; cv2x= 575;  cv2y= 205; cv3x= 525;   cv3y= 255; cv4x= 475;  cv4y= 205;}
+    if(contadorClickDerecho==6){cv1x= 525;  cv1y= 155; cv2x= 600;  cv2y= 155; cv3x= 600;   cv3y= 230; cv4x= 525;  cv4y= 230;}
+	if(contadorClickDerecho==7){cv1x= 525;  cv1y= 155; cv2x= 575;  cv2y= 205; cv3x= 525;   cv3y= 255; cv4x= 475;  cv4y= 205;}
+	if(contadorClickDerecho==8){cv1x= 525;  cv1y= 155; cv2x= 600;  cv2y= 155; cv3x= 600;   cv3y= 230; cv4x= 525;  cv4y= 230;}
+	if(contadorClickDerecho==8){ contadorClickDerecho=0;} 
+	}
+		                       } 
+void rotarRombo()  {
+	if   (piezasEncajas[6]==0){
+    contadorClickDerecho++;
+    if(contadorClickDerecho==1){rv1x= 425;  rv1y= 255;   rv2x= 475;  rv2y= 305;   rv3x= 475;   rv3y= 405;  rv4x= 425;  rv4y= 355;}
+	if(contadorClickDerecho==2){rv1x= 425;  rv1y= 205;   rv2x= 525;  rv2y= 205;   rv3x= 475;   rv3y= 255;  rv4x= 375;  rv4y= 255;}
+	if(contadorClickDerecho==3){rv1x= 425;  rv1y= 305;   rv2x= 500;  rv2y= 230;   rv3x= 500;   rv3y= 305;  rv4x= 425;  rv4y= 380;}
+    if(contadorClickDerecho==4){rv1x= 425;  rv1y= 205;   rv2x= 525;  rv2y= 205;   rv3x= 475;   rv3y= 255;  rv4x= 375;  rv4y= 255;}
+	if(contadorClickDerecho==5){rv1x= 425;  rv1y= 305;   rv2x= 500;  rv2y= 230;   rv3x= 500;   rv3y= 305;  rv4x= 425;  rv4y= 380;}
+	if(contadorClickDerecho==6){rv1x= 425;  rv1y= 255;   rv2x= 475;  rv2y= 305;   rv3x= 475;   rv3y= 405;  rv4x= 425;  rv4y= 355;}
+	if(contadorClickDerecho==7){rv1x= 425;  rv1y= 205;   rv2x= 525;  rv2y= 205;   rv3x= 475;   rv3y= 255;  rv4x= 375;  rv4y= 255;}
+    if(contadorClickDerecho==3){rv1x= 425;  rv1y= 305;   rv2x= 500;  rv2y= 230;   rv3x= 500;   rv3y= 305;  rv4x= 425;  rv4y= 380;}
+	if(contadorClickDerecho==8){ contadorClickDerecho=0;} 
+	}
+	                                  
+	
+} 
+void Triangulo (int v1x, int v2x, int v3x,int v1y, int v2y, int v3y) {
+	int poly[8];  setcolor(15);
+	  
+      poly[0] =  v1x;      
+      poly[1] =  v1y;    
+	  
+	  poly[2] =  v2x;      
+      poly[3] =  v2y;      
+	  
+	  poly[4] =  v3x;      
+      poly[5] =  v3y;     
+	  
+	  poly[6] =  v1x;        
+      poly[7] =  v1y;  
+	  
+      fillpoly (4,poly); floodfill(v1x,v1y,15);       
+
+        }
+void Cuadrilatero (int v1x, int v2x, int v3x,int v4x,int v1y, int v2y, int v3y,int v4y) {
+	
+	 int poly[10];   setcolor(15);
+
+      poly[0] =  v1x;     
+      poly[1] =  v1y;      
+	  
+	  poly[2] =  v2x;      
+      poly[3] =  v2y;      
+	  
+	  poly[4] =  v3x;      
+      poly[5] =  v3y;      
+	  
+	  poly[6] =  v4x;         
+      poly[7] =  v4y;       
+	  
+	  poly[8] =  v1x;        
+      poly[9] =  v1y;       
+	  
+ 
+      fillpoly (5,poly); floodfill(v1x,v1y,15);        
+
+   }
+void figura(){
+	
+setfillstyle(SLASH_FILL,15);  
+	Triangulo    (actual [0],actual [1],actual [2],actual [3],actual [4],actual [5]); //triangulo actualerde
+	Triangulo    (actual [6],actual [7],actual [8],actual [9],actual[10],actual[11]);   // triangulo rojo
+	Triangulo    (actual[12],actual[13],actual[14],actual[15],actual[16],actual[17]); //light cyan
+	Triangulo    (actual[18],actual[19],actual[20],actual[21],actual[22],actual[23]); //cyan
+	Triangulo    (actual[24],actual[25],actual[26],actual[27],actual[28],actual[29]);  //magenta
+	Cuadrilatero (actual[30],actual[31],actual[32],actual[33],actual[34],actual[35],actual[36],actual[37]); //cuadrado
+	Cuadrilatero (actual[38],actual[39],actual[40],actual[41],actual[42],actual[43],actual[44],actual[45]); //rombo
+}
+   
+void PanelPrincipal (int maxx, int maxy) {
+setcolor(BLUE);                   
+rectangle(0,0,maxx-5,maxy-5);    
+} 
+
+void PanelFigura(){
+ setcolor(BLUE);
+ rectangle(2,25,400,425); 
+  char* cad = "Panel de piezas";
+ char buffer[200];
+ sprintf( buffer, "%s",cad);
+ settextstyle(SANS_SERIF_FONT,HORIZ_DIR,1);  
+ outtextxy(20,2,"Figura");
+ 
+}  
+	    
+void PanelPiezas(){
+ setcolor(BLUE);
+ rectangle(424,54,626,256); 
+ setcolor(RED);                  
+
+ char* cad = "Panel de piezas";
+ char buffer[200];
+ sprintf( buffer, "%s",cad);
+ settextstyle(SANS_SERIF_FONT,HORIZ_DIR,1);  
+ outtextxy(425,15,"PANEL DE PIEZAS");
+
+                   } 
+void botones(){
+ setcolor(9);
+ rectangle(20,430,maxx-450,maxy-10); 
+ //setfillstyle(SOLID_FILL,9); 
+ //floodfill(21,431,9);   
+ 
+ setcolor(9);
+ rectangle(200,430,maxx-250,maxy-10); 
+// setfillstyle(SOLID_FILL,12); 
+// floodfill(201,431,12);  
+
+ setcolor(BLUE);
+outtextxy(maxx/2-275,maxy-38,"ANTERIOR");
+outtextxy(maxx/2-50,maxy-38,"SIGUIENTE");
+}				   
+
+
+void cargaArchivo(int id){
+  asm cmp id,1
+  asm je  fig1
+  asm cmp id,2
+  asm je  fig2
+  asm cmp id,3
+  asm je  fig3
+  asm jmp novalido
+  
+  fig1:
+      asm MOV AH, 3DH
+      asm MOV AL, 0
+	  asm MOV DX, OFFSET nombreArchivo1
+      asm INT 21H        
+      asm MOV manejador, AX
+	   asm MOV AH, 3fh
+      asm MOV BX, manejador
+	
+	
+	  asm mov cx,offset 138//30
+      asm MOV DX, offset contenidoArchivo
+      asm INT 21H
+	  asm jmp sigue
+	  
+	  
+  fig2:
+      asm MOV AH, 3DH
+      asm MOV AL, 0
+	  asm MOV DX, OFFSET nombreArchivo2
+      asm INT 21H        
+      asm MOV manejador, AX
+	   asm MOV AH, 3fh
+      asm MOV BX, manejador
+	
+	
+	  asm mov cx,offset 138//30
+      asm MOV DX, offset contenidoArchivo2
+      asm INT 21H
+	  asm jmp sigue
+
+
+  fig3:
+      asm MOV AH, 3DH
+      asm MOV AL, 0
+	  asm MOV DX, OFFSET nombreArchivo3
+      asm INT 21H        
+      asm MOV manejador, AX
+	   asm MOV AH, 3fh
+      asm MOV BX, manejador
+	
+	
+	  asm mov cx,offset 138//30
+      asm MOV DX, offset contenidoArchivo3
+      asm INT 21H
+	 	  
+      
+	  sigue:
+     
+        
+      asm MOV AH, 3eh
+      asm MOV BX, manejador
+      asm int 21h
+
+	  asm	mov ah,3eh
+      asm  int 21h
+		
+	  novalido:
+
+		}
+		
+
+
+void menu2(){
+setcolor(RED);
+settextstyle(SANS_SERIF_FONT,HORIZ_DIR,1);
+char* cad = "";
+char buffer[200]; 
+
+
+//sprintf( buffer, "%s %d %d %d %d %d %d ",cad,tvv1x,tvv2x,tvv3x,tvv1y,tvv2y,tvv3y); //verde
+//outtextxy(maxx/2-315,maxy-28,buffer);
+
+
+//sprintf( buffer, "%s %d %d %d %d %d %d ",cad,trv1x,trv2x,trv3x,trv1y,trv2y,trv3y); //rojo
+//outtextxy(maxx/2-315,maxy-28,buffer);
+//sprintf( buffer, "%s %d %d %d %d %d %d ",cad,tav1x,tav2x,tav3x,tav1y,tav2y,tav3y); //light cyan
+//outtextxy(maxx/2-315,maxy-28,buffer);
+//sprintf( buffer, "%s %d %d %d %d %d %d ",cad,tbv1x,tbv2x,tbv3x,tbv1y,tbv2y,tbv3y); //cyan
+//outtextxy(maxx/2-315,maxy-28,buffer);
+//sprintf( buffer, "%s %d %d %d %d %d %d ",cad,tmv1x,tmv2x,tmv3x,tmv1y,tmv2y,tmv3y); //magenta
+//outtextxy(maxx/2-315,maxy-28,buffer);
+//sprintf( buffer, "%s %d %d %d %d %d %d %d %d",cad,cv1x,cv2x,cv3x,cv4x,cv1y,cv2y,cv3y,cv4y); //cuadrado
+//outtextxy(maxx/2-315,maxy-28,buffer);
+//sprintf( buffer, "%s %d %d %d %d %d %d %d %d",cad,rv1x,rv2x,rv3x,rv4x,rv1y,rv2y,rv3y,rv4y);  //rombo
+//outtextxy(maxx/2-315,maxy-28,buffer);
+		 }
+
+
+void refrescar(int maxx,int maxy){
+OcultarMouse();
+//cargaArchivo(1);
+//cargarFigura();
+
+PanelPrincipal(maxx, maxy);
+menu2();
+PanelFigura();
+PanelPiezas();
+figura();
+botones();
+setfillstyle(SOLID_FILL,7);  //cuadrado LIGHTGRAY
+Cuadrilatero (cv1x,cv2x,cv3x,cv4x,cv1y,cv2y,cv3y,cv4y);
+setfillstyle(SOLID_FILL,5);  //triangulo MAGENTA
+Triangulo    (tmv1x,tmv2x,tmv3x,tmv1y,tmv2y,tmv3y);
+setfillstyle(SOLID_FILL,4);  //triangulo RED
+Triangulo    (trv1x,trv2x,trv3x,trv1y,trv2y,trv3y);
+setfillstyle(SOLID_FILL,2); //triangulo GREEN
+Triangulo    (tvv1x,tvv2x,tvv3x,tvv1y,tvv2y,tvv3y);
+setfillstyle(SOLID_FILL,3); //triangulo CYAN
+Triangulo    (tav1x,tav2x,tav3x,tav1y,tav2y,tav3y);
+setfillstyle(SOLID_FILL,11); //Triangulo LIGHTCYAN
+Triangulo    (tbv1x,tbv2x,tbv3x,tbv1y,tbv2y,tbv3y);
+setfillstyle(SOLID_FILL,6); // Romboide BROWN
+Cuadrilatero (rv1x,rv2x,rv3x,rv4x,rv1y,rv2y,rv3y,rv4y);
+
+settextstyle(SANS_SERIF_FONT,HORIZ_DIR,1);
+	if (piezasEncajas[5]==1){ setcolor(7);outtextxy (100,2,"||||| 1");}
+	if (piezasEncajas[6]==1){ setcolor(6);outtextxy (140,2,"||||| 2");}
+    if (piezasEncajas[0]==1){ setcolor(2);outtextxy (180,2,"||||| 3");}
+    if (piezasEncajas[1]==1){ setcolor(4);outtextxy (220,2,"||||| 4");}
+	if (piezasEncajas[2]==1){ setcolor(11);outtextxy(260,2,"||||| 5");}
+	if (piezasEncajas[3]==1){ setcolor(3) ;outtextxy(300,2,"||||| 6");}
+	if (piezasEncajas[4]==1){ setcolor(5) ;outtextxy(340,2,"||||| 7 ||||| ");}
+	if (contadorPiezas==7){settextstyle(SANS_SERIF_FONT,HORIZ_DIR,2);
+                       	setcolor(BLUE); outtextxy(445,100,"COMPLETADO!!!");}
+	
+	
+}
+
+void cargarFigura(){
+	
+	
+	char buf[138];
+	int  numero;
+	char cade[3];
+	
+	int k=0;
+	int i=0;
+	int j=0;
+	
+	//______________________________
+		for(i=0; i<138;i++){
+	buf[i]=contenidoArchivo[i];
+		}
+	
+	
+	for(i=0; i<46;i++){
+		for(j=0; j<3;j++){
+           cade[j]=buf[k];
+		          k++;
+		                }
+       numero = atoi(cade);
+	   v[i]=numero;
+	}
+	k=0;
+	//________________________
+	
+	
+		//______________________________
+		for(i=0; i<138;i++){
+	buf[i]=contenidoArchivo2[i];
+		}
+	
+	
+	for(i=0; i<46;i++){
+		for(j=0; j<3;j++){
+           cade[j]=buf[k];
+		          k++;
+		                }
+       numero = atoi(cade);
+	   v2[i]=numero;
+	}
+	k=0;
+	//________________________
+
+		//______________________________
+		for(i=0; i<138;i++){
+	buf[i]=contenidoArchivo3[i];
+		}
+	
+	
+	for(i=0; i<46;i++){
+		for(j=0; j<3;j++){
+           cade[j]=buf[k];
+		          k++;
+		                }
+       numero = atoi(cade);
+	   v3[i]=numero;
+	}
+	//________________________
+	
+
+	 if (id==1){for(i=0;i<46;i++){actual[i]=v[i];} limpiarPantalla(xx,yy); refrescar(maxx,maxy);}
+	 if (id==2){for(i=0;i<46;i++){actual[i]=v2[i];} limpiarPantalla(xx,yy); refrescar(maxx,maxy);}
+	 if (id==3){for(i=0;i<46;i++){actual[i]=v3[i];} limpiarPantalla(xx,yy); refrescar(maxx,maxy);}
+
+	 for(i=0;i<7; i++){
+		 
+		piezasEncajas[i]=0;
+	 }
+	 
+	 iniciarVertices();
+	  limpiarPantalla(xx,yy); refrescar(maxx,maxy);
+	 }
+
+void rotarPieza(int * color,int xx, int yy, int maxx, int maxy){
+	  int auxcolor= *color;
+	  asm mov ax,auxcolor;
+
+	  asm cmp ax,7
+	  asm je rotarCuadrado
+	  asm cmp ax,6
+	  asm je rotarRombo
+	  asm cmp ax,5
+	  asm je rotarTriangulo_magenta
+	  asm cmp ax,4
+	  asm je rotarTriangulo_rojo
+	  asm cmp ax,2
+	  asm je rotarTriangulo_verde
+	  asm cmp ax,3
+	  asm je rotarTriangulo_cyan
+	  asm cmp ax,11
+	  asm je rotarTriangulo_lcyan
+
+	  asm jmp terminaRotacion
+
+	   rotarCuadrado:           rotarCuadrado();          asm jmp terminaRotacion
+	   rotarTriangulo_magenta:  rotarTriangulo_magenta(); asm jmp terminaRotacion
+	   rotarTriangulo_rojo:     rotarTriangulo_rojo();    asm jmp terminaRotacion
+	   rotarTriangulo_verde:    rotarTriangulo_verde();   asm jmp terminaRotacion
+	   rotarTriangulo_cyan:     rotarTriangulo_cyan();    asm jmp terminaRotacion
+	   rotarTriangulo_lcyan:    rotarTriangulo_lcyan();   asm jmp terminaRotacion
+	   rotarRombo:              rotarRombo ();                    terminaRotacion:
+
+
+
+	limpiarPantalla(xx,yy);
+    refrescar(maxx,maxy);
+						 }
+   void dentroBotones()	{
+	int maximox=maxx-450;
+	int maximoy=maxy-10;
+	asm mov ax,maximox
+	asm mov dx,maximoy
+	
+	
+	asm cmp x,20
+	asm jb nodentro
+	asm cmp y,430
+	asm jb nodentro
+	asm cmp x,ax
+	asm ja nodentro
+	asm cmp y,dx
+    asm ja nodentro
+	//cargaArchivo(2);
+	 id++;
+	 if (id==4){id=1;}
+	 cargarFigura(); 
+	 //if (id==1){for(int i=0;i<46;i++){actual[i]=v[i];}}
+	 //if (id==2){for(int i=0;i<46;i++){actual[i]=v2[i];}}
+	 //if (id==3){for(int i=0;i<46;i++){actual[i]=v3[i];}}
+	 //for(int m=0;m<46;m++){actual[m]=v3[m];}
+
+    //limpiarPantalla(xx,yy);
+	//refrescar(maxx,maxy);
+	nodentro:
+	maximox=maxx-250;
+	asm mov ax,maximox
+	asm cmp x,200
+	asm jb nodentro2
+	asm cmp y,430
+	asm jb nodentro2
+	asm cmp x,ax
+	asm ja nodentro2
+	asm cmp y,dx
+    asm ja nodentro2
+	   id--;
+	 if (id==0){id=3;}
+	 cargarFigura(); 
+	
+   // limpiarPantalla(xx,yy);
+//	refrescar(maxx,maxy);
+	
+	nodentro2:
+	
+	
+ }
+void moverPieza(int * color,int xx, int yy, int maxx, int maxy){
+	  int auxcolor= *color;
+	      asm mov ax,auxcolor;
+	      prevx=x; prevy=y;
+      while (button==1){
+
+	
+	  
+		 if ((x!= prevx) || (y!=prevy)){
+
+			auxx=x-prevx;
+		    auxy=y-prevy;
+
+			asm cmp auxcolor,2
+			asm je moverTriangulo_verde
+			asm cmp auxcolor,4
+			asm je moverTriangulo_rojo
+			asm cmp auxcolor,5
+			asm je moverTriangulo_magenta
+			asm cmp auxcolor,7
+			asm je moverCuadrado
+			asm cmp auxcolor,6
+			asm je moverRombo
+			asm cmp auxcolor,11
+			asm je moverTriangulo_lcyan
+			asm cmp auxcolor,3
+			asm je moverTriangulo_cyan
+			asm jmp terminaMover
+
+	moverTriangulo_verde      : moverTriangulo_verde     (&auxx,&auxy); asm jmp terminaMover
+	moverTriangulo_rojo       : moverTriangulo_rojo      (&auxx,&auxy); asm jmp terminaMover
+    moverTriangulo_magenta    : moverTriangulo_magenta   (&auxx,&auxy); asm jmp terminaMover
+    moverCuadrado             : moverCuadrado            (&auxx,&auxy); asm jmp terminaMover
+	moverRombo                : moverRombo               (&auxx,&auxy); asm jmp terminaMover
+	moverTriangulo_lcyan      : moverTriangulo_lcyan     (&auxx,&auxy); asm jmp terminaMover
+	moverTriangulo_cyan 	  : moverTriangulo_cyan      (&auxx,&auxy);         terminaMover:
+
+
+		limpiarPantalla(xx,yy);
+		refrescar(maxx,maxy);
+
+		prevx=x;
+		    prevy=y;
+						}    //end if
+
+	    ObtenerMousePos(&button,&x,&y);
+
+					    }   //end while
+						
+						dentroBotones();
+
+}
+
+void moverPiezaTeclado( int * color ){
+
+	int auxcolor= *color;
+    asm mov ax,auxcolor;
+
+			asm cmp auxcolor,2
+			asm je moverTriangulo_verde
+			asm cmp auxcolor,4
+			asm je moverTriangulo_rojo
+			asm cmp auxcolor,5
+			asm je moverTriangulo_magenta
+			asm cmp auxcolor,7
+			asm je moverCuadrado
+			asm cmp auxcolor,6
+			asm je moverRombo
+			asm cmp auxcolor,11
+			asm je moverTriangulo_lcyan
+			asm cmp auxcolor,3
+			asm je moverTriangulo_cyan  
+			asm jmp terminaMover
+
+	moverTriangulo_verde      : moverTriangulo_verde     (&auxx,&auxy); asm jmp terminaMover
+	moverTriangulo_rojo       : moverTriangulo_rojo      (&auxx,&auxy); asm jmp terminaMover
+    moverTriangulo_magenta    : moverTriangulo_magenta   (&auxx,&auxy); asm jmp terminaMover
+    moverCuadrado             : moverCuadrado            (&auxx,&auxy); asm jmp terminaMover
+	moverRombo                : moverRombo               (&auxx,&auxy); asm jmp terminaMover
+	moverTriangulo_lcyan      : moverTriangulo_lcyan     (&auxx,&auxy); asm jmp terminaMover
+	moverTriangulo_cyan 	  : moverTriangulo_cyan      (&auxx,&auxy);         terminaMover:
+
+
+}
+
+
+								
+
+
+void main(){
+//char xx,yy;
+int gd = DETECT,gm;
+//char nombreArchivo1[] = "dato.txt0";
+//char nombre[] ="gato.txt";
+
+cargaArchivo(1);
+cargaArchivo(2);
+cargaArchivo(3);
+initgraph(&gd,&gm,"C:\\TC\\BGI");
+	  auxx=0;
+      auxy=0;
+      contadorClickDerecho=0;
+
+
+ xx =   getmaxx();             //para registro alto o bajo
+ yy =   getmaxy();             //para registro alto o bajo
+ maxx = getmaxx();             //Devuelve la coordenada x máxima de pantalla.
+ maxy = getmaxy();             //Devuelve la coordenada y máxima de pantalla.
+
+
+
+refrescar(maxx,maxy);
+limpiarPantalla(xx,yy);
+
+iniciarVertices();
+cargarFigura();
+
+refrescar(maxx,maxy);
+FijarLimites (0,0,maxx-2,maxy-2);
+MostrarMouse();
+
+while(1){
+    // se dio click izquierdo o derecho
+	asm mov ax, 03h
+    asm int 33h
+    asm cmp bx, 1
+	asm je mover
+	asm cmp bx, 2
+	asm je rotar
+	asm jmp sigue
+
+		mover:
+
+	ObtenerMousePos   (&button,&x,&y);
+	color = getpixel  (x-1,y-1);
+		colorTeclado=color;
+	    moverPieza        (&color,xx,yy,maxx,maxy);
+	    asm jmp salto
+
+
+	    rotar:
+		ObtenerMousePos   (&button,&x,&y);
+	color = getpixel  (x-1,y-1);
+		colorTeclado=color;
+	    rotarPieza        (&color,xx,yy,maxx,maxy);
+		OcultarMouse();
+		asm jmp salto
+
+
+
+    sigue:
+
+   asm mov ah,1
+   asm int 16h
+   asm jz salto
+
+   asm MOV AH,0
+   asm INT 16H
+
+    asm cmp al,65     //A
+	asm je moverizq
+	asm cmp al,68     //D
+	asm je moverder
+	asm cmp al,87     //W
+	asm je moverarr
+	asm cmp al,83     //S
+	asm je moveraba
+    asm cmp al,27     //ESC
+    asm jne salto
+
+
+
+
+
+    closegraph();   // Finalizar
+    exit(0);
+
+moverizq:
+auxx=-1;
+auxy=0;
+moverPiezaTeclado     (&colorTeclado);
+limpiarPantalla(xx,yy);
+refrescar(maxx,maxy);
+asm jmp salto
+
+moverder:
+auxx=1;
+auxy=0;
+moverPiezaTeclado     (&colorTeclado);
+limpiarPantalla(xx,yy);
+refrescar(maxx,maxy);
+asm jmp salto
+
+moverarr:
+auxy=-1;
+auxx=0;
+
+moverPiezaTeclado     (&colorTeclado);
+limpiarPantalla(xx,yy);
+refrescar(maxx,maxy);
+asm jmp salto
+
+moveraba:
+auxy=1;
+auxx=0;
+moverPiezaTeclado     (&colorTeclado);
+limpiarPantalla(xx,yy);
+refrescar(maxx,maxy);
+
+
+
+salto:
+MostrarMouse();
+
+
+}
+}

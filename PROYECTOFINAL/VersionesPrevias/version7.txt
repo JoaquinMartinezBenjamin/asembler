@@ -1,0 +1,265 @@
+#include<graphics.h>
+#include<dos.h>
+#include<math.h>
+#include<stdlib.h>
+#include<stdio.h>
+#include<conio.h>
+
+      int v1x= 427;
+	  int v2x= 537;
+	  int v3x= 624;
+      int v1y= 7;
+	  int v2y= 107;
+	  int v3y= 7;
+	  
+	
+
+void limpiarPantalla(char xx,char yy) {
+  
+   asm      mov ah, 06
+   asm      mov al, 00 
+   asm      mov bh, 15
+   asm      mov cx, 00h        //esquina supererior izquierda
+   asm      mov dh,xx
+   asm      mov dl,yy
+   asm      int 10h
+}  
+
+void Triangulo (int v1x, int v2x, int v3x,int v1y, int v2y, int v3y) {
+	
+    setcolor(GREEN);
+	int poly[8];
+	 
+	/* v1x= v1x+ auxx;
+	 v2x= v2x+ auxx;
+	 v3x= v3x+ auxx;
+	 
+	 v1y= v1y+ auxy;
+	 v2y= v2y+ auxy;
+	 v3y= v3y+ auxy;*/
+	  
+      poly[0] =  v1x;      //x
+      poly[1] =  v1y;      //y
+	  
+	  poly[2] =  v2x;      //x
+      poly[3] =  v2y;     //y
+	  
+	  poly[4] =  v3x;      //x
+      poly[5] =  v3y;      //y
+	  
+	  poly[6] =  v1x; //poly[0];  //x   
+      poly[7] =  v1y; //poly[1];  //y  para cerrar el triangulo 
+	  
+ 
+      fillpoly (4,poly); 
+		   
+	  setfillstyle(SOLID_FILL,3);  // Dos por el color verde 
+
+      floodfill(v1x,v1y,2); //de la ezquina superior izquierda de la figura
+
+   //auxx=0;
+   //auxy=0;
+	  
+  }
+  
+void PanelPrincipal (int maxx, int maxy) {
+setcolor(BLUE);                   
+rectangle(0,0,maxx-5,maxy-5);    
+} 
+
+void PanelFigura(){
+ setcolor(BLUE);
+ rectangle(2,2,400,400); 
+}  
+	    
+void PanelPiezas(){
+setcolor(BLUE);
+rectangle(425,5,625,205); 
+} 
+
+
+void menu1(int maxx, int maxy){
+setcolor(RED);                                 // para letras del menu
+settextstyle(SANS_SERIF_FONT,HORIZ_DIR,1);     //estilo de letras
+outtextxy(maxx/2-315,maxy-28, "");
+
+           //Sintaxis:   void far outtextxy (int x, int y, char far *cadena_de_texto);
+
+		   }
+void MostrarMouse()  {                                 //Mostra el mouse en la pantalla
+asm mov ax, 01h
+asm int 33h
+}
+void OcultarMouse()  {                                 //Ocultar el cursor del mouse
+asm mov ax, 02h
+asm int 33h
+}
+
+void FijarLimites( int x1, int y1, int x2, int y2){
+
+//Limites horizontales 
+
+asm mov ax, 07h 
+asm mov cx, x1
+asm mov dx, x2
+asm int 33h
+
+//Limites verticales 
+asm mov ax, 08h 
+asm mov cx, y1
+asm mov dx, y2
+asm int 33h
+}
+
+void ObtenerMousePos(int *button,int *x,int *y){
+//Obtener posición del puntero del mouse 
+
+int aux, auy, b;
+
+asm mov ax, 03h
+asm int 33h
+asm mov aux, cx
+asm mov auy, dx
+asm mov b, bx
+
+*button = b;
+*x =aux;
+*y =auy;
+}
+/*
+void ObtenerColorPixel (int * color){
+	char aux_color;
+	
+asm mov ax, 03h
+asm int 33h
+asm dec dx
+asm dec cx
+	
+asm mov ah, 0fh
+asm int 10h    //modo de video actual
+
+
+
+asm mov ah, 0dh
+asm int 10h 
+
+//deja en al color de pixel
+
+asm mov aux_color,al
+*color=aux_color;
+
+}*/
+
+
+void refrescar(int maxx,int maxy){
+	
+	
+PanelPrincipal(maxx, maxy);
+menu1(maxx, maxy);	
+PanelFigura();
+PanelPiezas();	
+Triangulo(v1x,v2x,v3x,v1y,v2y,v3y); //:::::::::::::::::::::::::::::::::::::::
+
+//FijarLimites (5,5,maxx-5,maxy-5); 
+
+}
+
+void main(){
+
+	
+int x,y,button,prevx,prevy,temp1,temp2,key;
+char color;
+	
+int gd = DETECT,gm;
+initgraph(&gd,&gm,"C:\\TC\\BGI");
+
+ char xx =   getmaxx();
+ char yy =   getmaxy();
+ int  maxx = getmaxx();             //Devuelve la coordenada x máxima de pantalla.
+ int  maxy = getmaxy();             //Devuelve la coordenada y máxima de pantalla.
+
+
+limpiarPantalla(xx,yy);
+
+//refrescar(maxx,maxy);
+ int auxx=0;
+	  int auxy=0;
+refrescar(maxx,maxy);  
+
+FijarLimites (0,0,maxx-2,maxy-2);  
+MostrarMouse();                                 //mostrar mouse
+//setbkcolor (BLACK);
+refrescar(maxx,maxy);
+    
+
+while(1)
+{
+	asm mov bx,0
+	
+    asm mov ax, 03h
+    asm int 33h
+	 
+	asm cmp bx, 1
+	asm jne sigue
+	ObtenerMousePos(&button,&x,&y);
+	//prevx=x;
+	//prevy=y;
+	color = getpixel (x-1,y-1);
+	asm cmp color,3    //verde_triangulo 
+	asm jne salto 
+	asm jmp mover_triangulo_verde
+	
+	
+sigue:
+asm mov ah,1
+asm int 16h
+asm jz salto
+
+asm MOV AH,0
+asm INT 16H
+
+asm cmp al,27   //tecla esc 
+asm jne salto
+
+closegraph();
+//getch();
+exit(0);
+
+//________________________________________________
+mover_triangulo_verde:
+        prevx=x;
+		prevy=y;
+	
+    while (button==1){
+		
+		
+		 if ((x!= prevx) || (y!=prevy)){
+			auxx=x-prevx;
+		    auxy=y-prevy;
+	v1x=v1x+ auxx;
+	v1y=v1y+ auxy;
+	
+	//v2x=v2x+ auxx;
+	//v2y=v2y+ auxy; 
+	
+	//v3x=v3x+(x-prevx);
+	//v3y=v3y+(y-prevy);
+	
+	limpiarPantalla(xx,yy);	
+	
+	refrescar(maxx,maxy);      
+	    prevx=x;
+		prevy=y;
+		 }
+		
+    ObtenerMousePos(&button,&x,&y);
+
+	}
+ 
+   
+//________________________________________________
+salto:
+MostrarMouse();
+
+}
+}

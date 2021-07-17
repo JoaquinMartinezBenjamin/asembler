@@ -1,0 +1,209 @@
+#include<graphics.h>
+#include<dos.h>
+#include<math.h>
+#include<stdlib.h>
+#include<stdio.h>
+#include<conio.h>
+
+
+
+
+void limpiarPantalla(char xx,char yy) {
+  
+   asm      mov ah, 06
+   asm      mov al, 00 
+   asm      mov bh, 15
+   asm      mov cx, 00h        //esquina supererior izquierda
+   asm      mov dh,xx
+   asm      mov dl,yy
+   asm      int 10h
+}  
+
+void Triangulo () {
+	  
+	  setcolor(GREEN);
+	  int poly[8];
+      poly[0] =  427;      //x
+      poly[1] =  7;        //y
+	  
+	  poly[2] =  527;      //x
+      poly[3] =  107;      //y
+	  
+	  poly[4] =  624;      //x
+      poly[5] =  7;        //y
+	  
+	  poly[6] =  poly[0];  //x   
+      poly[7] =  poly[1];  //y  para cerrar el triangulo 
+	  
+ 
+      fillpoly (4,poly); 
+		   
+	  setfillstyle(SOLID_FILL,2);  // Dos por el color verde 
+
+      floodfill(427,7,2); //de la ezquina superior izquierda de la figura
+
+  }
+  
+void PanelPrincipal (int maxx, int maxy) {
+setcolor(BLUE);                   
+rectangle(0,0,maxx-5,maxy-5);    
+} 
+
+void PanelFigura(){
+ setcolor(BLUE);
+ rectangle(2,2,400,400); 
+}  
+	    
+void PanelPiezas(){
+setcolor(BLUE);
+rectangle(425,5,625,205); 
+} 
+
+
+void menu1(int maxx, int maxy){
+setcolor(RED);                                 // para letras del menu
+settextstyle(SANS_SERIF_FONT,HORIZ_DIR,1);     //estilo de letras
+outtextxy(maxx/2-315,maxy-28, "");
+
+           //Sintaxis:   void far outtextxy (int x, int y, char far *cadena_de_texto);
+
+		   }
+void MostrarMouse()  {                                 //Mostra el mouse en la pantalla
+asm mov ax, 01h
+asm int 33h
+}
+void OcultarMouse()  {                                 //Ocultar el cursor del mouse
+asm mov ax, 02h
+asm int 33h
+}
+
+void FijarLimites( int x1, int y1, int x2, int y2){
+
+//Limites horizontales 
+
+asm mov ax, 07h 
+asm mov cx, x1
+asm mov dx, x2
+asm int 33h
+
+//Limites verticales 
+asm mov ax, 08h 
+asm mov cx, y1
+asm mov dx, y2
+asm int 33h
+}
+
+void ObtenerMousePos(int *button,int *x,int *y){
+//Obtener posición del puntero del mouse 
+
+int aux, auy, b;
+
+asm mov ax, 03h
+asm int 33h
+asm mov aux, cx
+asm mov auy, dx
+asm mov b, bx
+
+*button = b;
+*x =aux;
+*y =auy;
+}
+
+void ObtenerColorPixel (int * color){
+	char aux_color;
+	
+	asm mov ax, 03h
+asm int 33h
+asm dec dx
+asm dec cx
+	
+asm mov ah, 0fh
+asm int 10h    //modo de video actual
+
+
+
+asm mov ah, 0dh
+asm int 10h 
+
+//deja en al color de pixel
+
+asm mov aux_color,al
+*color=aux_color;
+
+}
+
+
+void refrescar(int maxx,int maxy){
+PanelPrincipal(maxx, maxy);
+PanelFigura();
+PanelPiezas();	
+Triangulo(); //:::::::::::::::::::::::::::::::::::::::
+menu1(maxx, maxy);	
+
+}
+
+void main(){
+
+	
+int x,y,button,prevx,prevy,temp1,temp2,key;
+char color;
+
+int gd = DETECT,gm;
+initgraph(&gd,&gm,"C:\\TC\\BGI");
+
+ char xx =   getmaxx();
+ char yy =   getmaxy();
+ int  maxx = getmaxx();             //Devuelve la coordenada x máxima de pantalla.
+ int  maxy = getmaxy();             //Devuelve la coordenada y máxima de pantalla.
+
+
+limpiarPantalla(xx,yy);
+
+refrescar(maxx,maxy);
+
+FijarLimites (5,5,maxx-5,maxy-5);  //633+7=640  //limites de alcance del mouse
+MostrarMouse();                                 //mostrar mouse
+//setbkcolor (BLACK);
+refrescar(maxx,maxy);
+
+while(1)
+{
+	
+    asm mov ax, 03h
+    asm int 33h
+	asm cmp bx, 1
+	asm je mover 
+
+asm mov ah,1
+asm int 16h
+asm jz salto
+
+asm MOV AH,0
+asm INT 16H
+
+//asm cmp al,48   //tecla 0
+//asm je mover
+
+asm cmp al,27   //tecla esc 
+asm jne salto
+closegraph();
+exit(0);
+
+mover:
+
+
+	ObtenerMousePos(&button,&x,&y);
+    color = getpixel (x-1,y-1);
+	setcolor(color);
+    outtextxy(x,y,"MENSAJE DE PRUEBA");
+	
+	
+   refrescar(maxx,maxy);
+   
+
+
+salto:
+MostrarMouse();
+
+}
+}

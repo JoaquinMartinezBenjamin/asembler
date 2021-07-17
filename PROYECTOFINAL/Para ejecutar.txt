@@ -1,0 +1,15 @@
+1 Descomprimir turbo c++ en en la raiz del disco duro 
+
+2 Ejecutar dosbox.exe 
+
+3 Mover el archivo Proyecto.cpp y gato1,gato2,gato3.txt  a Turbo c++/Disk/BGI 
+
+4 Desde DOSBOX  File/Change dir/ 
+
+5 Elegir el directorio BGI 
+
+6 Abrir el archivo desde file/open y buscar el archivo en la ruta donde ser guardo en el paso 3 
+
+7 Compilar y ejecutar con control + f9 
+
+8 Salir del programa con ESC 
